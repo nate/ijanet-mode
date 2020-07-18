@@ -164,18 +164,6 @@ This is a simple wrapper around the built-in `split-string'."
       (maintain-indentation content  0))
     (comint-send-string ijanet-shell-buffer-name "\n")))
 
-;; (defun ijanet-type-check ()
-;;   (interactive)
-;;   (comint-send-string ijanet-shell-buffer-name (concat "let ijanetmodetype: () = " (thing-at-point 'symbol) ";"))
-;;   (comint-send-string ijanet-shell-buffer-name "\n")
-;;   )
-
-;; (defun ijanet-type-check-in-container ()
-;;   (interactive)
-;;   (comint-send-string ijanet-shell-buffer-name (concat "let ijanetmodetype: () = " (thing-at-point 'symbol) "[0];"))
-;;   (comint-send-string ijanet-shell-buffer-name "\n")
-;;   )
-
 (defun ijanet-parent-directory (dir)
   "Find the parent directory of DIR."
   (unless (equal "/" dir)
