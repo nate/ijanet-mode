@@ -16,12 +16,12 @@
 ;;
 
 
-(defun regex-match ( regex-string string-search match-num )
+;;; Code:
+
+(defun regex-match (regex-string string-search match-num)
+  "Match REGEX-STRING against STRING-SEARCH and return MATCH-NUM."
   (string-match regex-string string-search)
   (match-string match-num string-search))
-
-
-
 
 (defcustom ijanet-shell-buffer-name "*Ijanet*"
   "Name of buffer for ijanet."
@@ -44,14 +44,10 @@ Unless ARG is non-nil, switch to the buffer."
     (unless (ijanet-is-running?)
       (with-current-buffer buffer
         (ijanet-startup)
-        (inferior-ijanet-mode)
-	)
+        (inferior-ijanet-mode))
       (pop-to-buffer buffer)
-      (other-window -1)
-      )
-    ;; (with-current-buffer buffer (inferior-ijanet-mode))
+      (other-window -1))
     buffer))
-
 
 
 ;;;###autoload
@@ -62,37 +58,33 @@ Unless ARG is non-nil, switch to the buffer."
 
 (defun ijanet-startup ()
   "Start ijanet."
-(apply 'make-comint-in-buffer "janet" ijanet-shell-buffer-name ijanet-program nil (list "-s")))
-
-
+  (apply 'make-comint-in-buffer "janet" ijanet-shell-buffer-name ijanet-program nil (list "-s")))
 
 (defun maintain-indentation (current previous-indent)
+  "Main indentation of CURRENT forms given the PREVIOUS-INDENT."
   (when current
     (let ((current-indent (length (ijanet-match-indentation (car current)))))
       (if (< current-indent previous-indent)
-	  (progn
-	    (comint-send-string ijanet-shell-buffer-name "\n")
-	    (comint-send-string ijanet-shell-buffer-name (car current))
-	    (comint-send-string ijanet-shell-buffer-name "\n"))
-      (progn
-	(comint-send-string ijanet-shell-buffer-name (car current))
-	(comint-send-string ijanet-shell-buffer-name "\n")))
-      (maintain-indentation (cdr current) current-indent)
-      )))
+          (progn
+            (comint-send-string ijanet-shell-buffer-name "\n")
+            (comint-send-string ijanet-shell-buffer-name (car current))
+            (comint-send-string ijanet-shell-buffer-name "\n"))
+        (progn
+          (comint-send-string ijanet-shell-buffer-name (car current))
+          (comint-send-string ijanet-shell-buffer-name "\n")))
+      (maintain-indentation (cdr current) current-indent))))
 
 (defun ijanet-split (separator s &optional omit-nulls)
-  "Split S into substrings bounded by matches for regexp SEPARATOR.
+  "Split string S on SEPARATOR.
 If OMIT-NULLS is non-nil, zero-length substrings are omitted.
 This is a simple wrapper around the built-in `split-string'."
   (declare (side-effect-free t))
   (save-match-data
     (split-string s separator omit-nulls)))
 
-
-(defun ijanet-match-indentation(data)
+(defun ijanet-match-indentation (data)
+  "Match the indentation of string DATA."
   (regex-match "^[[:space:]]*" data 0))
-
-
 
 (defun ijanet-eval-region (begin end)
   "Evaluate region between BEGIN and END."
@@ -100,18 +92,11 @@ This is a simple wrapper around the built-in `split-string'."
   (ijanet t)
   (progn
     (let ((content (ijanet-split "\n" (buffer-substring-no-properties begin end)) ))
-
       (print (buffer-substring-no-properties (region-beginning) (region-end)))
       (print content)
       (print (buffer-substring-no-properties begin end))
-      (maintain-indentation content  0)
-  )
+      (maintain-indentation content  0))
     (comint-send-string ijanet-shell-buffer-name "\n")))
-
-
-
-
-
 
 ;; (defun ijanet-type-check ()
 ;;   (interactive)
@@ -125,13 +110,13 @@ This is a simple wrapper around the built-in `split-string'."
 ;;   (comint-send-string ijanet-shell-buffer-name "\n")
 ;;   )
 
-
 (defun ijanet-parent-directory (dir)
+  "Find the parent directory of DIR."
   (unless (equal "/" dir)
     (file-name-directory (directory-file-name dir))))
 
 (defun ijanet-find-file-in-hierarchy (current-dir fname)
-  "Search for a file named FNAME upwards through the directory hierarchy, starting from CURRENT-DIR"
+  "Search for a file named FNAME upwards through the directory hierarchy, starting from CURRENT-DIR."
   (let ((file (concat current-dir fname))
         (parent (ijanet-parent-directory (expand-file-name current-dir))))
     (if (file-exists-p file)
@@ -139,15 +124,12 @@ This is a simple wrapper around the built-in `split-string'."
       (when parent
         (ijanet-find-file-in-hierarchy parent fname)))))
 
-
 (defun ijanet-get-string-from-file (filePath)
-  "Return filePath's file content.
-;; thanks to “Pascal J Bourguignon” and “TheFlyingDutchman 〔zzbba…@aol.com〕”. 2010-09-02
-"
+  "Return FILEPATH's file content.
+Thanks to “Pascal J Bourguignon” and “TheFlyingDutchman 〔zzbba…@aol.com〕”. 2010-09-02."
   (with-temp-buffer
     (insert-file-contents filePath)
     (buffer-string)))
-
 
 (defun ijanet-eval-buffer ()
   "Evaluate complete buffer."
@@ -170,33 +152,31 @@ current one."
 ;;; Shell integration
 
 (defcustom ijanet-shell-interpreter "janet -s"
-  "default repl for shell"
+  "Default repl interpreter command."
   :type 'string
   :group 'ijanet)
 
 (defcustom ijanet-shell-internal-buffer-name "Ijanet Internal"
-  "Default buffer name for the internal process"
+  "Default buffer name for the internal process."
   :type 'string
   :group 'janet
   :safe 'stringp)
 
-
 (defcustom ijanet-shell-prompt-regexp "janet:[:digit:]+: "
   "Regexp to match prompts for ijanet.
-   Matchint top\-level input prompt"
+Matchint top\-level input prompt."
   :group 'ijanet
   :type 'regexp
   :safe 'stringp)
 
-
 (defcustom ijanet-shell-prompt-block-regexp " "
-  "Regular expression matching block input prompt"
+  "Regular expression matching block input prompt."
   :type 'string
   :group 'ijanet
   :safe 'stringp)
 
 (defcustom ijanet-shell-prompt-output-regexp ""
-  "Regular Expression matching output prompt of evxcr"
+  "Regular Expression matching output prompt of evxcr."
   :type 'string
   :group 'ijanet
   :safe 'stringp)
@@ -208,11 +188,11 @@ current one."
   :safe 'booleanp)
 
 (defcustom ijanet-shell-compilation-regexp-alist '(("[[:space:]]\\^+?"))
-  "Compilation regexp alist for inferior ijanet"
+  "Compilation regexp alist for inferior ijanet."
   :type '(alist string))
 
 (defgroup ijanet nil
-  "Janet interactive mode"
+  "Janet interactive mode."
   :link '(url-link "https://github.com/serialdev/ijanet-mode")
   :prefix "ijanet"
   :group 'languages)
@@ -222,13 +202,10 @@ current one."
   :group 'ijanet
   :type 'file)
 
-
 (defcustom ijanet-args "-s"
   "Command line arguments for `ijanet-program'."
   :group 'ijanet
   :type '(repeat string))
-
-
 
 (defcustom ijanet-prompt-read-only t
   "Make the prompt read only.
@@ -238,18 +215,17 @@ See `comint-prompt-read-only' for details."
 
 (defun ijanet-comint-output-filter-function (output)
   "Hook run after content is put into comint buffer.
-   OUTPUT is a string with the contents of the buffer"
+OUTPUT is a string with the contents of the buffer"
   (ansi-color-filter-apply output))
 
 
-(defun ijanet-eval-sexp-at-point()
+(defun ijanet-eval-sexp-at-point ()
+  "Evaluate the sexp at the current cursor point."
   (interactive)
   (let ((sexp (sexp-at-point) ))
     (when sexp
-    (comint-send-string ijanet-shell-buffer-name     (message "%s" sexp))
-    )
-    (comint-send-string ijanet-shell-buffer-name "\n")
-  ))
+      (comint-send-string ijanet-shell-buffer-name     (message "%s" sexp)))
+    (comint-send-string ijanet-shell-buffer-name "\n")))
 
 
 (define-derived-mode inferior-ijanet-mode comint-mode "Ijanet"
@@ -259,22 +235,18 @@ See `comint-prompt-read-only' for details."
   (setq mode-line-process '(":%s"))
   (make-local-variable 'comint-output-filter-functions)
   (add-hook 'comint-output-filter-functions
-  	    'ijanet-comint-output-filter-function)
+            'ijanet-comint-output-filter-function)
   (set (make-local-variable 'compilation-error-regexp-alist)
        ijanet-shell-compilation-regexp-alist)
   (setq comint-use-prompt-regexp t)
   (setq comint-inhibit-carriage-motion nil)
-  (setq-local comint-prompt-read-only ijanet-prompt-read-only)
-  )
+  (setq-local comint-prompt-read-only ijanet-prompt-read-only))
 
 ;; (progn
 ;;   (define-key janet-mode-map (kbd "C-c C-b") #'ijanet-eval-buffer)
 ;;   (define-key janet-mode-map (kbd "C-c C-r") #'ijanet-eval-region)
 ;;   (define-key janet-mode-map (kbd "C-c C-l") #'ijanet-eval-line)
 ;;   (define-key janet-mode-map (kbd "C-c C-p") #'ijanet))
-
-
-
 
 (provide 'ijanet)
 
