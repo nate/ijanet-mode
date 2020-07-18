@@ -18,6 +18,8 @@
 
 ;;; Code:
 
+(require 'comint)
+(require 'compile)
 
 (defcustom ijanet-shell-interpreter "janet -s"
   "Default repl interpreter command."
