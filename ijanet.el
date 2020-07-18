@@ -246,11 +246,12 @@ OUTPUT is a string with the contents of the buffer"
   (setq comint-inhibit-carriage-motion nil)
   (setq-local comint-prompt-read-only ijanet-prompt-read-only))
 
-;; (progn
-;;   (define-key janet-mode-map (kbd "C-c C-b") #'ijanet-eval-buffer)
-;;   (define-key janet-mode-map (kbd "C-c C-r") #'ijanet-eval-region)
-;;   (define-key janet-mode-map (kbd "C-c C-l") #'ijanet-eval-line)
-;;   (define-key janet-mode-map (kbd "C-c C-p") #'ijanet))
+(progn
+  (defvar janet-mode-map (make-sparse-keymap))
+  (define-key janet-mode-map (kbd "C-c C-j C-b") #'ijanet-eval-buffer)
+  (define-key janet-mode-map (kbd "C-c C-j C-r") #'ijanet-eval-region)
+  (define-key janet-mode-map (kbd "C-c C-j C-l") #'ijanet-eval-line)
+  (define-key janet-mode-map (kbd "C-c C-j C-s") #'ijanet))
 
 (provide 'ijanet)
 
