@@ -18,6 +18,70 @@
 
 ;;; Code:
 
+
+(defcustom ijanet-shell-interpreter "janet -s"
+  "Default repl interpreter command."
+  :type 'string
+  :group 'ijanet)
+
+(defcustom ijanet-shell-internal-buffer-name "Ijanet Internal"
+  "Default buffer name for the internal process."
+  :type 'string
+  :group 'janet
+  :safe 'stringp)
+
+(defcustom ijanet-shell-prompt-regexp "janet:[:digit:]+: "
+  "Regexp to match prompts for ijanet.
+Matchint top\-level input prompt."
+  :group 'ijanet
+  :type 'regexp
+  :safe 'stringp)
+
+(defcustom ijanet-shell-prompt-block-regexp " "
+  "Regular expression matching block input prompt."
+  :type 'string
+  :group 'ijanet
+  :safe 'stringp)
+
+(defcustom ijanet-shell-prompt-output-regexp ""
+  "Regular Expression matching output prompt of evxcr."
+  :type 'string
+  :group 'ijanet
+  :safe 'stringp)
+
+(defcustom ijanet-shell-enable-font-lock t
+  "Should syntax highlighting be enabled in the ijanet shell buffer?"
+  :type 'boolean
+  :group 'ijanet
+  :safe 'booleanp)
+
+(defcustom ijanet-shell-compilation-regexp-alist '(("[[:space:]]\\^+?"))
+  "Compilation regexp alist for inferior ijanet."
+  :type '(alist string)
+  :group 'ijanet)
+
+(defgroup ijanet nil
+  "Janet interactive mode."
+  :link '(url-link "https://github.com/serialdev/ijanet-mode")
+  :prefix "ijanet"
+  :group 'languages)
+
+(defcustom ijanet-program (executable-find "janet")
+  "Program invoked by `ijanet'."
+  :group 'ijanet
+  :type 'file)
+
+(defcustom ijanet-args "-s"
+  "Command line arguments for `ijanet-program'."
+  :group 'ijanet
+  :type '(repeat string))
+
+(defcustom ijanet-prompt-read-only t
+  "Make the prompt read only.
+See `comint-prompt-read-only' for details."
+  :group 'ijanet
+  :type 'boolean)
+
 (defun regex-match (regex-string string-search match-num)
   "Match REGEX-STRING against STRING-SEARCH and return MATCH-NUM."
   (string-match regex-string string-search)
@@ -150,68 +214,6 @@ current one."
 
 
 ;;; Shell integration
-
-(defcustom ijanet-shell-interpreter "janet -s"
-  "Default repl interpreter command."
-  :type 'string
-  :group 'ijanet)
-
-(defcustom ijanet-shell-internal-buffer-name "Ijanet Internal"
-  "Default buffer name for the internal process."
-  :type 'string
-  :group 'janet
-  :safe 'stringp)
-
-(defcustom ijanet-shell-prompt-regexp "janet:[:digit:]+: "
-  "Regexp to match prompts for ijanet.
-Matchint top\-level input prompt."
-  :group 'ijanet
-  :type 'regexp
-  :safe 'stringp)
-
-(defcustom ijanet-shell-prompt-block-regexp " "
-  "Regular expression matching block input prompt."
-  :type 'string
-  :group 'ijanet
-  :safe 'stringp)
-
-(defcustom ijanet-shell-prompt-output-regexp ""
-  "Regular Expression matching output prompt of evxcr."
-  :type 'string
-  :group 'ijanet
-  :safe 'stringp)
-
-(defcustom ijanet-shell-enable-font-lock t
-  "Should syntax highlighting be enabled in the ijanet shell buffer?"
-  :type 'boolean
-  :group 'ijanet
-  :safe 'booleanp)
-
-(defcustom ijanet-shell-compilation-regexp-alist '(("[[:space:]]\\^+?"))
-  "Compilation regexp alist for inferior ijanet."
-  :type '(alist string))
-
-(defgroup ijanet nil
-  "Janet interactive mode."
-  :link '(url-link "https://github.com/serialdev/ijanet-mode")
-  :prefix "ijanet"
-  :group 'languages)
-
-(defcustom ijanet-program (executable-find "janet")
-  "Program invoked by `ijanet'."
-  :group 'ijanet
-  :type 'file)
-
-(defcustom ijanet-args "-s"
-  "Command line arguments for `ijanet-program'."
-  :group 'ijanet
-  :type '(repeat string))
-
-(defcustom ijanet-prompt-read-only t
-  "Make the prompt read only.
-See `comint-prompt-read-only' for details."
-  :group 'ijanet
-  :type 'boolean)
 
 (defun ijanet-comint-output-filter-function (output)
   "Hook run after content is put into comint buffer.
