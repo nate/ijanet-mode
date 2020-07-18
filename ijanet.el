@@ -210,9 +210,9 @@ OUTPUT is a string with the contents of the buffer"
 (defun ijanet-eval-sexp-at-point ()
   "Evaluate the sexp at the current cursor point."
   (interactive)
-  (let ((sexp (sexp-at-point) ))
+  (let ((sexp (sexp-at-point)))
     (when sexp
-      (comint-send-string ijanet-shell-buffer-name     (message "%s" sexp)))
+      (comint-send-string ijanet-shell-buffer-name (message "%s" sexp)))
     (comint-send-string ijanet-shell-buffer-name "\n")))
 
 
