@@ -214,14 +214,10 @@ current one."
      (line-beginning-position)
      (line-end-position arg))))
 
-
-;;; Shell integration
-
 (defun ijanet-comint-output-filter-function (output)
   "Hook run after content is put into comint buffer.
 OUTPUT is a string with the contents of the buffer"
   (ansi-color-filter-apply output))
-
 
 (defun ijanet-eval-sexp-at-point ()
   "Evaluate the sexp at the current cursor point."
